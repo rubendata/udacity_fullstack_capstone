@@ -1,0 +1,15 @@
+@import "./global.css";
+
+main{
+    grid-area:main;
+}
+
+#content{
+    margin: 0 auto;
+}
+
+.blog_container{
+    margin-top: 20px;
+    border: 1px black solid;
+}
+

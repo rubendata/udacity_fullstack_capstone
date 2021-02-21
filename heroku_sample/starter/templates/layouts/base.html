@@ -1,14 +1,20 @@
 <html lang="en">
 <head>
+    {% block head %}
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/nav.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}"/>
+    
     <title>{% block title %} {% endblock %} - mypage</title>
+    {% endblock %}
 </head>
 <body>
-    <div class="navigation">{% include "./includes/nav.html" ignore missing%}</div>
-    <div class="content">{% block content %} {% endblock %}</div>
-    <div class="footer">{% include "./includes/footer.html" ignore missing%}</div>
+    <header>{% include "./includes/nav.html" ignore missing%} </header>
+    <main id="content">{% block content %} {% endblock %}</main>
+    <footer class="footer">{% include "./includes/footer.html" ignore missing%}</footer>
     
     
 </body>
