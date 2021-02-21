@@ -1,0 +1,26 @@
+{% extends "layouts/base.html" %}
+{% block title%} Blog  {% endblock %}
+
+{% block content%}
+<section id="blog">
+    <label for ="search">Search post</label>
+    <input type ="search" id="search" name="search">
+    <label for ="search">Sort by</label>
+    <select id="search" name="search">
+        <option value="author">Author</option>
+        <option value="date">Date</option>
+        <option value="title">Title</option>
+        
+    </select>
+    <a href="{{ url_for('create_post') }}"><button type="button">New Post</button></a>
+    {% for post in posts %}
+    <div id={{"blog"~post.id}} class="blog_container">
+        <h1> {{post.Title}} </h1>
+        <h2> {{post.author}} </h2>
+        <p> {{post.date_posted}} </p>
+        <p> {{post.content}} </p>
+    </div>
+    {% endfor %}
+</section>
+{% endblock %}
+
