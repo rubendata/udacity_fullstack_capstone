@@ -1,0 +1,59 @@
+@import "./global.css";
+
+header{
+    grid-area: hd;
+    z-index: 99;
+    
+}
+
+#nav_title {
+    grid-area:title;
+}
+
+#nav_navigation{
+    grid-area: navigation;
+    display: flex;
+    justify-content: flex-end;
+    
+}
+
+nav {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 10vh;
+    background-color: white;
+    align-items: center;
+    display: grid;
+    grid-template-columns:1fr 1fr 1fr;
+    grid-template-areas: "logo title navigation";
+    border-bottom: 1px var(--primary-color) solid;
+    box-shadow: 0px 0px 10px white;
+    
+}
+
+#nav_logo {
+    grid-area: logo;
+    background: url(../img/logo.png) no-repeat center center;
+    height: 90%;
+    width: 100%;
+    background-size: contain;
+    
+}
+
+.nav_link{
+    margin-right: 20px;
+    cursor: pointer;
+    text-decoration: none;
+    text-transform: uppercase;
+}
+
+.nav_link:hover{
+    color: var(--secondary-color);
+}
+
+a.nav_link {
+    text-decoration: none;
+    color:var(--primary-color)
+}
