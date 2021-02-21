@@ -1,5 +1,5 @@
 import os
-from flask import Flask
+from flask import Flask, render_template
 from models import setup_db
 from flask_cors import CORS
 
@@ -9,20 +9,34 @@ def create_app(test_config=None):
     setup_db(app)
     CORS(app)
 
-    @app.route('/')
-    def get_greeting():
-        excited = os.environ['EXCITED']
-        greeting = "Hello" 
-        if excited == 'true': greeting = greeting + "!!!!!"
-        return greeting
+    posts = [{
+        "author":"Ruben Simon",
+        "Title":"Blog Post 1",
+        "content":"This is the content",
+        "date_posted":"April 20, 2020",
+    },
+    {
+        "author":"Ruben Simon",
+        "Title":"Blog Post 2",
+        "content":"This is the content",
+        "date_posted":"May 20, 2020",
+    }]
 
-    @app.route('/coolkids')
-    def be_cool():
-        return "Be cool, man, be coooool! You're almost a FSND grad!"
+    @app.route('/')
+    def get_home():
+       
+        return render_template("home.html", posts=posts)
+
+    @app.route('/about')
+    def get_about():
+        return render_template("about.html")
 
     return app
+
+
+
 
 app = create_app()
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
