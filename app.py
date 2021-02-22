@@ -52,7 +52,7 @@ def create_app(test_config=None):
     def blog():
         posts = Post.query.all()
         return render_template("blog.html", posts=posts)
-
+    
     @app.route('/posts/create', methods=['POST', 'GET'])
     def create_post():
         form = PostForm(request.form)
@@ -61,18 +61,12 @@ def create_app(test_config=None):
             try:
                 post = Post()
                 form.populate_obj(post)
-                print(post.title)
                 post.insert()
-                
-                
-                return redirect (url_for("home"))
+                return redirect (url_for("blog"))
                 
             except Exception as e:
                 print(e)
                 abort(400)
-            
-
-        
         return render_template("new_post.html", form=form)
         
 
