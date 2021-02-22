@@ -1,15 +1,20 @@
 import os
-from flask import Flask, render_template
+from flask import Flask, render_template, abort, jsonify
+from flask.globals import request
+from flask.helpers import url_for
 from flask.templating import Environment
-from models import setup_db
+from werkzeug.utils import redirect
+from models import setup_db, db, Post
 from flask_cors import CORS
 from forms import *
+from flask_migrate import Migrate
 
 def create_app(test_config=None):
 
     app = Flask(__name__)
-    app.config['SECRET_KEY']= 'formkey' #for form wtf TODO: env var
+    app.config['SECRET_KEY']= os.environ['SECRET_KEY']
     setup_db(app)
+    migrate = Migrate(app, db)
     CORS(app)
 
 #DUMMY POSTS DATA
@@ -45,15 +50,31 @@ def create_app(test_config=None):
 
     @app.route('/posts')
     def blog():
+        posts = Post.query.all()
         return render_template("blog.html", posts=posts)
 
-    @app.route('/posts/create')
+    @app.route('/posts/create', methods=['POST', 'GET'])
     def create_post():
-        form = PostForm()
+        form = PostForm(request.form)
+        
+        if request.method == "POST":
+            try:
+                post = Post()
+                form.populate_obj(post)
+                print(post.title)
+                post.insert()
+                
+                
+                return redirect (url_for("home"))
+                
+            except Exception as e:
+                print(e)
+                abort(400)
+            
+
+        
         return render_template("new_post.html", form=form)
-
-
-
+        
 
     return app
 

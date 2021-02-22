@@ -17,6 +17,10 @@
         <label for="name">Content</label>
         {{ form.content(class_ = 'form-control', autofocus = true) }}
       </div>
+      <div class="form-group">
+        <label for="name">Date</label>
+        {{ form.date(class_ = 'form-control', autofocus = true) }}
+      </div>
       <input type="submit" value="Create Post" class="btn btn-primary btn-lg btn-block">
 </form>
 {% endblock %}
