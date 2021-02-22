@@ -15,9 +15,9 @@
     <a href="{{ url_for('create_post') }}"><button type="button">New Post</button></a>
     {% for post in posts %}
     <div id={{"blog"~post.id}} class="blog_container">
-        <h1> {{post.Title}} </h1>
+        <h1> {{post.title}} </h1>
         <h2> {{post.author}} </h2>
-        <p> {{post.date_posted}} </p>
+        <p> {{post.date}} </p>
         <p> {{post.content}} </p>
     </div>
     {% endfor %}

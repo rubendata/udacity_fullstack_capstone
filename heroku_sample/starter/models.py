@@ -19,23 +19,35 @@ def setup_db(app, database_path=database_path):
     db.create_all()
 
 
-'''
-Person
-Have title and release year
-'''
-class Person(db.Model):  
-  __tablename__ = 'People'
 
-  id = Column(Integer, primary_key=True)
-  name = Column(String)
-  catchphrase = Column(String)
+class Post(db.Model):  
+  __tablename__ = 'posts'
 
-  def __init__(self, name, catchphrase=""):
-    self.name = name
-    self.catchphrase = catchphrase
+  id = db.Column(db.Integer(), primary_key=True)
+  title = db.Column(db.String(400), nullable=False)
+  content = db.Column(db.String(8000), nullable=False)
+  author = db.Column(db.String(200), nullable=False)
+  date = db.Column(db.Date(), nullable=False)
 
+  def __init__(self, **kwargs):
+    super(Post, self).__init__(**kwargs)
+  
   def format(self):
     return {
       'id': self.id,
-      'name': self.name,
-      'catchphrase': self.catchphrase}
+      'title': self.title,
+      'content': self.content,
+      'author': self.author,
+      'date': self.date,
+    }
+
+  def insert(self):
+    db.session.add(self)
+    db.session.commit()
+
+  def update(self):
+    db.session.commit()
+
+  def delete(self):
+    db.session.delete(self)
+    db.session.commit()
