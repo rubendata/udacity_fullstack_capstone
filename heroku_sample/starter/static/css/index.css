@@ -1,0 +1,26 @@
+@import "./global.css";
+
+main{
+    grid-area:main;
+    width: 100vw;
+    background-color: rgb(240,240,240);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+#welcome {
+    width: 90%;
+    height: 400px;
+    background-color: white;
+}
+
+#hero{
+    width: 100%;    
+    height: 100%;
+   
+    
+    background: url(../img/stock.jpg) no-repeat center center;
+    background-size: contain;
+    
+}

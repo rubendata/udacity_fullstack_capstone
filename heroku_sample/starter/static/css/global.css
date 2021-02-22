@@ -18,6 +18,7 @@
     --font-size-normal: 2.1rem;
     --font-size-big: 2.8rem;
     --font-size-bigger: 3.6rem;
+    --nav-height: 10vh;
 }
 
 
@@ -43,6 +44,10 @@ body {
     "main";
     overflow-x: hidden;
     
+}
+
+main {
+    padding-top: var(--nav-height);
 }
 
 a{
