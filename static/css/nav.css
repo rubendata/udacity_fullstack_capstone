@@ -1,19 +1,11 @@
 @import "./global.css";
+@import url('https://fonts.googleapis.com/css2?family=Redressed&family=Roboto:wght@300&display=swap');
+
+
 
 header{
-    grid-area: hd;
     z-index: 99;
     
-}
-
-#nav_title {
-    grid-area:title;
-}
-
-#nav_navigation{
-    grid-area: navigation;
-    display: flex;
-    justify-content: flex-end;
     
 }
 
@@ -33,12 +25,21 @@ nav {
     
 }
 
+#nav_title {
+    grid-area:title;
+    font-family: 'Redressed', cursive, sans-serif;
+    font-size: var(--font-size-bigger);
+    
+}
+
+#nav_navigation{
+    grid-area: navigation;
+    
+}
+
 #nav_logo {
     grid-area: logo;
-    background: url(../img/logo.png) no-repeat center center;
-    height: 90%;
-    width: 100%;
-    background-size: contain;
+    height: 0px;
     
 }
 
@@ -55,4 +56,19 @@ nav {
 
 a.nav_link {
     color:var(--primary-color)
+}
+
+@media only screen and (max-width: 600px){
+    nav {
+     
+        display: grid;
+        grid-template-rows: 1fr 1fr;
+        grid-template-columns:1fr;
+        grid-template-areas: 
+      
+        "title"
+        "navigation";
+      
+        
+    }
 }
