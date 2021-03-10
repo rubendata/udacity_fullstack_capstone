@@ -1,13 +1,13 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, DateField
+from wtforms import StringField, DateField, TextAreaField
 from wtforms.fields.html5 import URLField
 from wtforms.validators import DataRequired, url
 from datetime import datetime
 
 class PostForm(FlaskForm):
-    title = StringField('title', validators=[DataRequired()])
-    author = StringField('author', validators=[DataRequired()])
-    content = StringField('content', validators=[DataRequired()])
-    image = URLField('image', validators=[DataRequired(), url()])
-    date = DateField('date', validators=[DataRequired()],default= datetime.today())
+    title = StringField('Title', validators=[DataRequired()])
+    author = StringField('Author', validators=[DataRequired()])
+    comment = TextAreaField('Comment', validators=[DataRequired()])
+    image = URLField('Image', validators=[DataRequired(), url()])
+    date = DateField('Date', validators=[DataRequired()],default= datetime.today())
 
