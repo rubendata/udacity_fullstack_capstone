@@ -3,26 +3,26 @@
 
 {% block content%}
 
-<form class="form" id="form" method="POST">
+<form class="form flex_col_center" id="form" method="POST">
     <h1 class="form-heading">Create a new Post</h1>
       <div class="form-group">
-        <label for="name">Title</label>
+        <label for="title">Title</label>
         {{ form.title(class_ = 'form-control', autofocus = true) }}
       </div>
       <div class="form-group">
-        <label for="name">Author</label>
+        <label for="author">Author</label>
         {{ form.author(class_ = 'form-control', autofocus = true) }}
       </div>
       <div class="form-group">
-        <label for="name">Content</label>
-        {{ form.content(class_ = 'form-control', autofocus = true) }}
+        <label for="comment">Comment</label>
+        {{ form.comment(class_ = 'form-control', args=(8,2), autofocus = true) }}
       </div>
       <div class="form-group">
-        <label for="name">image</label>
-        {{ form.image(class_ = 'form-control', placeholder = 'https://...',autofocus = true) }}
+        <label for="image">Image</label>
+        {{ form.image(class_ = 'form-control', type="url", placeholder = 'https://...',autofocus = true) }}
       </div>
       <div class="form-group">
-        <label for="name">Date</label>
+        <label for="date">Date</label>
         {{ form.date(class_ = 'form-control', autofocus = true) }}
       </div>
       <input type="submit" value="Create Post" class="btn btn-primary btn-lg btn-block">

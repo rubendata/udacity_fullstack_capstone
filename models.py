@@ -24,9 +24,9 @@ class Post(db.Model):
   __tablename__ = 'posts'
 
   id = db.Column(db.Integer(), primary_key=True)
-  title = db.Column(db.String(400), nullable=False)
-  content = db.Column(db.String(400), nullable=False)
-  author = db.Column(db.String(200), nullable=False)
+  title = db.Column(db.String(), nullable=False)
+  comment = db.Column(db.String(), nullable=False)
+  author = db.Column(db.String(), nullable=False)
   image = db.Column(db.String(), nullable=False)
   date = db.Column(db.Date(), nullable=False)
 
@@ -37,7 +37,7 @@ class Post(db.Model):
     return {
       'id': self.id,
       'title': self.title,
-      'content': self.content,
+      'comment': self.comment,
       'author': self.author,
       'date': self.date,
     }

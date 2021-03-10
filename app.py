@@ -16,6 +16,7 @@ def create_app(test_config=None):
     setup_db(app)
     migrate = Migrate(app, db)
     CORS(app)
+    
 
 #DUMMY POSTS DATA
     posts = [{
