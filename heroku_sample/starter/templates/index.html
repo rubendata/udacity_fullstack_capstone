@@ -1,25 +1,21 @@
 {% extends "layouts/base.html" %}
-{% block title%} Home  {% endblock %}
+{% block title%} Blog  {% endblock %}
 
 {% block content%}
-<section id="welcome">
-   <div id="hero">
-      <h1>The average joe investment guide</h1>
-      <h2>Beat the market and harvest a passive income</h2>
-      <input type="email" name="email" id="email">
-      <input type="submit" value="Start Now" class="">
-   </div>
-
-   
-</section>
-
-
-<section id="posts">
-   <div id="slider"></div>
-</section>
-
-<section id="process">
-   <a href="http://starkandwayne.com"></a>
+<section id="content" class="flex_col_center">
+    <label for ="search" class="search">Search post</label>
+    <input type ="search" id="search" name="search">
+    
+    
+    <a href="{{ url_for('create_post') }}"><button type="button" class="btn_round">New Post</button></a>
+    {% for post in posts %}
+    <div id={{"blog"~post.id}} class="post_container">
+        <h1> {{post.title}} </h1>
+        <div class="flex_col_center"> <img src="{{post.image}}" alt="post image" class="post_image"> </div>
+        <h2>"{{post.content}}" </h2>
+        <p class="posted"> posted by: {{post.author}}, {{post.date}} </p>
+    </div>
+    {% endfor %}
 </section>
 {% endblock %}
 

@@ -25,8 +25,9 @@ class Post(db.Model):
 
   id = db.Column(db.Integer(), primary_key=True)
   title = db.Column(db.String(400), nullable=False)
-  content = db.Column(db.String(8000), nullable=False)
+  content = db.Column(db.String(400), nullable=False)
   author = db.Column(db.String(200), nullable=False)
+  image = db.Column(db.String(), nullable=False)
   date = db.Column(db.Date(), nullable=False)
 
   def __init__(self, **kwargs):

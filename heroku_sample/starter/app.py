@@ -46,12 +46,10 @@ def create_app(test_config=None):
     @app.route('/home')
     def home():
        
-        return render_template("index.html")
-
-    @app.route('/posts')
-    def blog():
         posts = Post.query.all()
-        return render_template("blog.html", posts=posts)
+        return render_template("index.html", posts=posts)
+
+   
     
     @app.route('/posts/create', methods=['POST', 'GET'])
     def create_post():
@@ -62,13 +60,16 @@ def create_app(test_config=None):
                 post = Post()
                 form.populate_obj(post)
                 post.insert()
-                return redirect (url_for("blog"))
+                return redirect (url_for("home"))
                 
             except Exception as e:
                 print(e)
                 abort(400)
-        return render_template("new_post.html", form=form)
-        
+        return render_template("form.html", form=form)
+    
+    @app.route('/login')
+    def login():
+        return render_template("login.html")
 
     return app
 

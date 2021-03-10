@@ -7,15 +7,19 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}"/>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/nav.css') }}"/>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}"/>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/blog.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/form.css') }}"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com"> <!-- Font for Ustagram Title -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet"> <!-- Font for Ustagram Title -->
+    
+    
     
     <title>{% block title %} {% endblock %} - mypage</title>
     {% endblock %}
 </head>
 <body>
     <header>{% include "./includes/nav.html" ignore missing%} </header>
-    <main id="content">{% block content %} {% endblock %}</main>
-    <footer class="footer">{% include "./includes/footer.html" ignore missing%}</footer>
+    <main>{% block content %} {% endblock %}</main>
+    <footer>{% include "./includes/footer.html" ignore missing%}</footer>
     
     
 </body>

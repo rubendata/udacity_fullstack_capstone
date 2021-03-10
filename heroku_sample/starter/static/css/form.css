@@ -1,0 +1,10 @@
+@import "./global.css";
+
+.form-control{
+    width: 80%;
+    resize: none;
+    box-sizing: border-box;
+    height: 100px;
+    font-size: 16px;
+    padding: 0px;
+}
