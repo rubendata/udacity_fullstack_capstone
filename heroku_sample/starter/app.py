@@ -40,14 +40,9 @@ def create_app(test_config=None):
     migrate = Migrate(app, db)
     CORS(app)
 
-    @app.errorhandler(Exception)
-    def handle_auth_error(ex):
-        response = jsonify(message=str(ex))
-        response.status_code = (ex.code if isinstance(ex, HTTPException) else 500)
-        return response
-
-    oauth = OAuth(app)
     
+    #Set up auth0
+    oauth = OAuth(app)
     auth0 = oauth.register(
         'auth0',
         client_id=AUTH0_CLIENT_ID,
@@ -69,19 +64,14 @@ def create_app(test_config=None):
         return decorated
 
 
-    
-
-
-
-#ROUTES
+#API routes
     @app.route('/')
-    @app.route('/index')
-    @app.route('/home')
     def home():
        
         posts = Post.query.all()
         return render_template("index.html", posts=posts)
 
+    #calback handling for Auth0
     @app.route('/callback')
     def callback_handling():
         auth0.authorize_access_token()
@@ -121,7 +111,28 @@ def create_app(test_config=None):
     
     @app.route('/login')
     def login():
+        # userinfo=session[constants.PROFILE_KEY],
+        # userinfo_pretty=json.dumps(session[constants.JWT_PAYLOAD], indent=4)
+        # print(userinfo_pretty)
         return auth0.authorize_redirect(redirect_uri=AUTH0_CALLBACK_URL, audience=AUTH0_AUDIENCE)
+    
+    @app.route('/logout')
+    def logout():
+        try:
+            session.clear()
+            params = {'returnTo': url_for('home', _external=True), 'client_id': AUTH0_CLIENT_ID}
+            return redirect(auth0.api_base_url + '/v2/logout?' + urlencode(params))
+        except Exception as e:
+            print (e)
+
+#Error handlers
+    #auth error handler
+    @app.errorhandler(Exception)
+    def handle_auth_error(ex):
+        response = jsonify(message=str(ex))
+        response.status_code = (ex.code if isinstance(ex, HTTPException) else 500)
+        return response
+
 
     return app
 
