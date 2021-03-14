@@ -6,7 +6,7 @@ from datetime import datetime
 
 class PostForm(FlaskForm):
     title = StringField('Title', validators=[DataRequired()])
-    author = StringField('Author', validators=[DataRequired()])
+    
     comment = TextAreaField('Comment', validators=[DataRequired()])
     image = URLField('Image', validators=[DataRequired(), url()])
     date = DateField('Date', validators=[DataRequired()],default= datetime.today())
