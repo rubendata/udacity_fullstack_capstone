@@ -9,10 +9,7 @@
         <label for="title">Title</label>
         {{ form.title(class_ = 'form-control', autofocus = true) }}
       </div>
-      <div class="form-group">
-        <label for="author">Author</label>
-        {{ form.author(class_ = 'form-control', autofocus = true) }}
-      </div>
+     
       <div class="form-group">
         <label for="comment">Comment</label>
         {{ form.comment(class_ = 'form-control', args=(8,2), autofocus = true) }}
@@ -26,6 +23,7 @@
         {{ form.date(class_ = 'form-control', autofocus = true) }}
       </div>
       <input type="submit" value="Create Post" class="btn btn-primary btn-lg btn-block">
+      <p></p>
 </form>
 {% endblock %}
 

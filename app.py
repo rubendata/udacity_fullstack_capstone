@@ -96,11 +96,13 @@ def create_app(test_config=None):
     @app.route('/posts/create', methods=['POST', 'GET'])
     def create_post():
         form = PostForm(request.form)
-        
+        userinfo=session[constants.PROFILE_KEY],
         if request.method == "POST":
             try:
+                author = userinfo[0].get("name")
                 post = Post()
                 form.populate_obj(post)
+                post.author = author
                 post.insert()
                 return redirect (url_for("home"))
                 
@@ -111,9 +113,6 @@ def create_app(test_config=None):
     
     @app.route('/login')
     def login():
-        # userinfo=session[constants.PROFILE_KEY],
-        # userinfo_pretty=json.dumps(session[constants.JWT_PAYLOAD], indent=4)
-        # print(userinfo_pretty)
         return auth0.authorize_redirect(redirect_uri=AUTH0_CALLBACK_URL, audience=AUTH0_AUDIENCE)
     
     @app.route('/logout')
