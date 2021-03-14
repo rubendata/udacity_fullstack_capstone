@@ -94,6 +94,7 @@ def create_app(test_config=None):
                             userinfo_pretty=json.dumps(session[constants.JWT_PAYLOAD], indent=4))
     
     @app.route('/posts/create', methods=['POST', 'GET'])
+    @requires_auth
     def create_post():
         form = PostForm(request.form)
         userinfo=session[constants.PROFILE_KEY],
