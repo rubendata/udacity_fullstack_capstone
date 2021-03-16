@@ -6,8 +6,14 @@
     <label for ="search" class="search">Search post</label>
     <input type ="search" id="search" name="search">
     
+    {% for i in permission %}  
+        {% if i=='post:images' %}, 
+        <a href="{{ url_for('create_post') }}"><button type="button" class="btn_round">New Post</button></a>
+        {% endif %}
+    {% endfor %}
     
-    <a href="{{ url_for('create_post') }}"><button type="button" class="btn_round">New Post</button></a>
+    
+    
     {% for post in posts %}
     <div id={{"blog"~post.id}} class="post_container">
         <h1> {{post.title}} </h1>
