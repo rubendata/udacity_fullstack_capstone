@@ -5,7 +5,7 @@ from flask.helpers import url_for
 from flask.templating import Environment
 from werkzeug.utils import redirect
 from models import setup_db, db, Post
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 from forms import *
 from flask_migrate import Migrate
 from dotenv import load_dotenv, find_dotenv
@@ -19,22 +19,26 @@ from six.moves.urllib.parse import urlencode
 
 import constants
 
+from auth import requires_auth, AuthError
+
 ENV_FILE = find_dotenv()
 if ENV_FILE:
     load_dotenv(ENV_FILE)
 
-AUTH0_CALLBACK_URL = env.get(constants.AUTH0_CALLBACK_URL)
-AUTH0_CLIENT_ID = env.get(constants.AUTH0_CLIENT_ID)
-AUTH0_CLIENT_SECRET = env.get(constants.AUTH0_CLIENT_SECRET)
-AUTH0_DOMAIN = env.get(constants.AUTH0_DOMAIN)
-AUTH0_BASE_URL = 'https://' + AUTH0_DOMAIN
-AUTH0_AUDIENCE = env.get(constants.AUTH0_AUDIENCE)
+AUTH0_CALLBACK_URL = os.getenv('AUTH0_CALLBACK_URL')
+AUTH0_CLIENT_ID = os.getenv('AUTH0_CLIENT_ID')
+AUTH0_CLIENT_SECRET = os.getenv('AUTH0_CLIENT_SECRET')
+AUTH0_DOMAIN = os.getenv('AUTH0_DOMAIN')
+AUTH0_BASE_URL = 'https://'+str(AUTH0_DOMAIN)
+AUTH0_AUDIENCE = os.getenv('AUTH0_AUDIENCE')
+
+
 
 
 def create_app(test_config=None):
 
     app = Flask(__name__)
-    app.secret_key = constants.SECRET_KEY
+    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
     app.debug = True
     setup_db(app)
     migrate = Migrate(app, db)
@@ -54,48 +58,61 @@ def create_app(test_config=None):
             'scope': 'openid profile email',
         },
     )
-    def requires_auth(f):
-        @wraps(f)
-        def decorated(*args, **kwargs):
-            if constants.PROFILE_KEY not in session:
-                return redirect('/login')
-            return f(*args, **kwargs)
 
-        return decorated
+    @app.after_request
+    def after_request(response):
+        response.headers.add('Access-Control-Allow-Headers',
+                             'Content-Type,Authorization,true')
+        response.headers.add('Access-Control-Allow-Methods',
+                             'GET,PATCH,POST,DELETE,OPTIONS')
+        return response
 
-
-#API routes
-    @app.route('/')
-    def home():
-       
-        posts = Post.query.all()
-        return render_template("index.html", posts=posts)
+   
+    @app.route('/login')
+    def login():
+        print('Audience: {}'.format(AUTH0_AUDIENCE))
+        return auth0.authorize_redirect(redirect_uri=AUTH0_CALLBACK_URL, audience=AUTH0_AUDIENCE)
+        
 
     #calback handling for Auth0
     @app.route('/callback')
     def callback_handling():
-        auth0.authorize_access_token()
+        token = auth0.authorize_access_token()
+        session['token'] = token['access_token']
+        print(session['token'])
         resp = auth0.get('userinfo')
         userinfo = resp.json()
-
+        
         session[constants.JWT_PAYLOAD] = userinfo
+        session[constants.JWT] = token['access_token']
         session[constants.PROFILE_KEY] = {
             'user_id': userinfo['sub'],
             'name': userinfo['name'],
             'picture': userinfo['picture']
         }
+        session[constants.SESSION_NAME] = userinfo['name']
+        
         return redirect('/profile')
+
+#API routes
+    @app.route('/')
+    def home():
+        posts = Post.query.all()
+        return render_template("index.html", posts=posts)
+
+
     
     @app.route('/profile')
-    @requires_auth
     def profile():
         return render_template('profile.html',
                             userinfo=session[constants.PROFILE_KEY],
-                            userinfo_pretty=json.dumps(session[constants.JWT_PAYLOAD], indent=4))
+                            userinfo_pretty=json.dumps(session[constants.JWT_PAYLOAD], indent=4),
+                            jwt=session[constants.JWT])
     
     @app.route('/posts/create', methods=['POST', 'GET'])
-    @requires_auth
-    def create_post():
+    @cross_origin()
+    @requires_auth('post:images')
+    def create_post(payload):
         form = PostForm(request.form)
         userinfo=session[constants.PROFILE_KEY],
         if request.method == "POST":
@@ -112,9 +129,6 @@ def create_app(test_config=None):
                 abort(400)
         return render_template("form.html", form=form)
     
-    @app.route('/login')
-    def login():
-        return auth0.authorize_redirect(redirect_uri=AUTH0_CALLBACK_URL, audience=AUTH0_AUDIENCE)
     
     @app.route('/logout')
     def logout():
@@ -126,17 +140,55 @@ def create_app(test_config=None):
             print (e)
 
 #Error handlers
-    #auth error handler
-    @app.errorhandler(Exception)
-    def handle_auth_error(ex):
-        response = jsonify(message=str(ex))
-        response.status_code = (ex.code if isinstance(ex, HTTPException) else 500)
-        return response
+    @app.errorhandler(400)
+    def bad_request(error):
+        return jsonify({
+            'success': False,
+            'error': 400,
+            "message": "bad request"
+        }), 400
 
+    @app.errorhandler(401)
+    def unauthorized(error):
+        return jsonify({
+            'success': False,
+            'error': 401,
+            "message": "unauthorized"
+        }), 401
+
+    @app.errorhandler(404)
+    def resource_not_found(error):
+        return jsonify({
+            'success': False,
+            'error': 404,
+            'message': 'resource not found'
+        }), 404
+
+    @app.errorhandler(405)
+    def method_not_allowed(error):
+        return jsonify({
+            'success': False,
+            'error': 405,
+            'message': 'method not allowed'
+        }), 405
+
+    @app.errorhandler(422)
+    def unprocessable_entity(error):
+        return jsonify({
+            'success': False,
+            'error': 422,
+            'message': 'unprocessable entity'
+        }), 422
+
+    @app.errorhandler(500)
+    def internal_server_error(error):
+        return jsonify({
+            'success': False,
+            'error': 500,
+            'message': 'internal server error'
+        }), 422
 
     return app
-
-
 
 
 app = create_app()
