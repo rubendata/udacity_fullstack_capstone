@@ -21,16 +21,7 @@ import constants
 
 from auth import requires_auth, AuthError
 
-ENV_FILE = find_dotenv()
-if ENV_FILE:
-    load_dotenv(ENV_FILE)
 
-AUTH0_CALLBACK_URL = os.getenv('AUTH0_CALLBACK_URL')
-AUTH0_CLIENT_ID = os.getenv('AUTH0_CLIENT_ID')
-AUTH0_CLIENT_SECRET = os.getenv('AUTH0_CLIENT_SECRET')
-AUTH0_DOMAIN = os.getenv('AUTH0_DOMAIN')
-AUTH0_BASE_URL = 'https://'+str(AUTH0_DOMAIN)
-AUTH0_AUDIENCE = os.getenv('AUTH0_AUDIENCE')
 
 
 
@@ -42,10 +33,38 @@ def create_app(test_config=None):
     app.debug = True
     setup_db(app)
     migrate = Migrate(app, db)
+    
+    # -------------------------------------------------------------------------#
+    # Enable CORS
+    # -------------------------------------------------------------------------#
     CORS(app)
+    @app.after_request
+    def after_request(response):
+        response.headers.add('Access-Control-Allow-Headers',
+                             'Content-Type,Authorization,true')
+        response.headers.add('Access-Control-Allow-Methods',
+                             'GET,PATCH,POST,DELETE,OPTIONS')
+        return response
+
+         
+    # -------------------------------------------------------------------------#
+    # Setup Auth0 and login
+    # -------------------------------------------------------------------------#
 
     
-    #Set up auth0
+    #load .env variables for Auth0
+    ENV_FILE = find_dotenv()
+    if ENV_FILE:
+        load_dotenv(ENV_FILE)
+
+    AUTH0_CALLBACK_URL = os.getenv('AUTH0_CALLBACK_URL')
+    AUTH0_CLIENT_ID = os.getenv('AUTH0_CLIENT_ID')
+    AUTH0_CLIENT_SECRET = os.getenv('AUTH0_CLIENT_SECRET')
+    AUTH0_DOMAIN = os.getenv('AUTH0_DOMAIN')
+    AUTH0_BASE_URL = 'https://'+str(AUTH0_DOMAIN)
+    AUTH0_AUDIENCE = os.getenv('AUTH0_AUDIENCE')
+
+    #Auth0 configuration
     oauth = OAuth(app)
     auth0 = oauth.register(
         'auth0',
@@ -59,22 +78,7 @@ def create_app(test_config=None):
         },
     )
 
-    @app.after_request
-    def after_request(response):
-        response.headers.add('Access-Control-Allow-Headers',
-                             'Content-Type,Authorization,true')
-        response.headers.add('Access-Control-Allow-Methods',
-                             'GET,PATCH,POST,DELETE,OPTIONS')
-        return response
-
-   
-    @app.route('/login')
-    def login():
-        print('Audience: {}'.format(AUTH0_AUDIENCE))
-        return auth0.authorize_redirect(redirect_uri=AUTH0_CALLBACK_URL, audience=AUTH0_AUDIENCE)
-        
-
-    #calback handling for Auth0
+    #callback handling for Auth0
     @app.route('/callback')
     def callback_handling():
         token = auth0.authorize_access_token()
@@ -93,15 +97,20 @@ def create_app(test_config=None):
         session[constants.SESSION_NAME] = userinfo['name']
         
         return redirect('/profile')
+    
+    @app.route('/login')
+    def login():
+        print('Audience: {}'.format(AUTH0_AUDIENCE))
+        return auth0.authorize_redirect(redirect_uri=AUTH0_CALLBACK_URL, audience=AUTH0_AUDIENCE)
 
-#API routes
+    # -------------------------------------------------------------------------#
+    # Application Routes
+    # -------------------------------------------------------------------------#
     @app.route('/')
     def home():
         posts = Post.query.all()
         return render_template("index.html", posts=posts)
 
-
-    
     @app.route('/profile')
     def profile():
         return render_template('profile.html',
@@ -139,7 +148,9 @@ def create_app(test_config=None):
         except Exception as e:
             print (e)
 
-#Error handlers
+    # -------------------------------------------------------------------------#
+    # Error handling
+    # -------------------------------------------------------------------------#
     @app.errorhandler(400)
     def bad_request(error):
         return jsonify({

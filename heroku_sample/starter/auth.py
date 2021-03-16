@@ -21,35 +21,49 @@ class AuthError(Exception):
 
 # Auth Header: Obtains the Access Token from the Authorization Header
 def get_token_auth_header():
-    if "Authorization" in request.headers:
-        auth_header = request.headers["Authorization"]
-        if auth_header:
-            bearer_token_array = auth_header.split(' ')
-            if (bearer_token_array[0] and
-                    bearer_token_array[0].lower() == "bearer" and
-                    bearer_token_array[1]):
-                return bearer_token_array[1]
-
-    raise AuthError({
-        'success': False,
-        'message': 'JWT not found',
-        'error': 401
-    }, 401)
-
-
-def check_permissions(permission, payload):
-    if 'permissions' not in payload:
-        print('permissions not in payload')
-        abort(400)
-
-    if permission not in payload['permissions']:
-        print(f'{permission} not in {payload["permissions"]}')
+    """Obtains the Access Token from the Authorization Header
+    Args: None
+    Returns: bearer token
+    """
+    auth = request.headers.get('Authorization', None)
+    if not auth:
         raise AuthError({
-            'success': False,
-            'message': 'Permission not found in JWT',
-            'error': 401
+            'code': 'authorization_header_missing',
+            'description': 'Authorization header is expected.'
         }, 401)
 
+    parts = auth.split()
+    if parts[0].lower() != 'bearer':
+        raise AuthError({
+            'code': 'invalid_header',
+            'description': 'Authorization header must start with "Bearer".'
+        }, 401)
+
+    elif len(parts) == 1:
+        raise AuthError({
+            'code': 'invalid_header',
+            'description': 'Token not found.'
+        }, 401)
+
+    elif len(parts) > 2:
+        raise AuthError({
+            'code': 'invalid_header',
+            'description': 'Authorization header must be bearer token.'
+        }, 401)
+
+    token = parts[1]
+    return token
+
+
+def check_permissions(permissions, payload):
+    """Checks if a permission is given in the jwt payload
+    Args: permissions, payload
+    Returns: True
+    """
+    if "permissions" not in payload:
+        abort(400)
+    if permissions not in payload["permissions"]:
+        abort(401)
     return True
 
 
@@ -58,23 +72,14 @@ def verify_decode_jwt(token):
     Args:token
     Returns: the decoded payload of the token
     """
-    # get the public key from Auth0
-    AUTH0_DOMAIN = os.getenv('AUTH0_DOMAIN')
-    ALGORITHMS = os.getenv('ALGORITHMS')
-    AUTH0_AUDIENCE = os.getenv('AUTH0_AUDIENCE')
-    print(f'https://{AUTH0_DOMAIN}/.well-known/jwks.json')
     jsonurl = urlopen(f'https://{AUTH0_DOMAIN}/.well-known/jwks.json')
     jwks = json.loads(jsonurl.read())
-
-    # get the data in the header
     unverified_header = jwt.get_unverified_header(token)
-    # choose key
     rsa_key = {}
     if 'kid' not in unverified_header:
         raise AuthError({
-            'success': False,
-            'message': 'Authorization malformed',
-            'error': 401,
+            'code': 'invalid_header',
+            'description': 'Authorization malformed.'
         }, 401)
 
     for key in jwks['keys']:
@@ -86,47 +91,37 @@ def verify_decode_jwt(token):
                 'n': key['n'],
                 'e': key['e']
             }
-
-    # Finally, verify
     if rsa_key:
-        print('rsa_key exists')
         try:
-            # use the key to validate the JWT
             payload = jwt.decode(
                 token,
                 rsa_key,
                 algorithms=ALGORITHMS,
                 audience=AUTH0_AUDIENCE,
-                issuer=f'https://{AUTH0_DOMAIN}/'
+                issuer='https://' + AUTH0_DOMAIN + '/'
             )
 
             return payload
 
         except jwt.ExpiredSignatureError:
             raise AuthError({
-                'success': False,
-                'message': 'Token expired',
-                'error': 401,
+                'code': 'token_expired',
+                'description': 'Token expired.'
             }, 401)
 
         except jwt.JWTClaimsError:
             raise AuthError({
-                'success': False,
-                'message': 'Incorrect claims.',
-                'error': 401,
+                'code': 'invalid_claims',
+                'description': 'Incorrect claims. Please, check the audience and issuer.'
             }, 401)
-
         except Exception:
             raise AuthError({
-                'success': False,
-                'message': 'Unable to parse authentication token',
-                'error': 400,
+                'code': 'invalid_header',
+                'description': 'Unable to parse authentication token.'
             }, 400)
-
     raise AuthError({
-        'success': False,
-        'message': 'Unable to find the appropriate key',
-        'error': 400,
+        'code': 'invalid_header',
+                'description': 'Unable to find the appropriate key.'
     }, 400)
 
 
@@ -135,19 +130,14 @@ def requires_auth(permission=''):
         @wraps(f)
         def wrapper(*args, **kwargs):
             try:
-                token = None
-                if "Test" in request.headers:
-                    token = get_token_auth_header()
-                elif session['token']:
+                if session['token']:
                     token = session['token']
                 else:
                     token = get_token_auth_header()
-                if token is None:
-                    abort(400)
                 payload = verify_decode_jwt(token)
-                
                 return f(payload, *args, **kwargs)
-            except Exception:
+            except Exception as e:
+                print(e)
                 abort(401)
 
         return wrapper
