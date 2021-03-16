@@ -32,7 +32,7 @@ h2{
     font-size: var(--font-size-big);
 }
 
-h3, p, a, div, li, label, input, select, option, button{
+h3, p, a, div, li, label, input, select, option, b, i, pre, button{
     font-size: var(--font-size-normal);
     }
 

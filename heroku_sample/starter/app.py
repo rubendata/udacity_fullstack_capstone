@@ -19,10 +19,7 @@ from six.moves.urllib.parse import urlencode
 
 import constants
 
-from auth import requires_auth, AuthError
-
-
-
+from auth import requires_auth, get_permission, verify_decode_jwt,AuthError
 
 
 
@@ -108,15 +105,16 @@ def create_app(test_config=None):
     # -------------------------------------------------------------------------#
     @app.route('/')
     def home():
+        permission = get_permission()
         posts = Post.query.all()
-        return render_template("index.html", posts=posts)
+        return render_template("index.html", posts=posts, permission=permission)
 
     @app.route('/profile')
     def profile():
         return render_template('profile.html',
                             userinfo=session[constants.PROFILE_KEY],
                             userinfo_pretty=json.dumps(session[constants.JWT_PAYLOAD], indent=4),
-                            jwt=session[constants.JWT])
+                            token=session['token'])
     
     @app.route('/posts/create', methods=['POST', 'GET'])
     @cross_origin()

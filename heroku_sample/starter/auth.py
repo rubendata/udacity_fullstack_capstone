@@ -1,5 +1,6 @@
 import json
 import os
+from typing import List
 from flask import request, _request_ctx_stack, abort, session
 from functools import wraps
 from jose import jwt
@@ -70,6 +71,50 @@ def check_permissions(permissions, payload):
         abort(401)
     return True
 
+
+def get_permission():
+    """Gets permission from jwt
+    Args: None
+    Returns: permissions list
+    """
+    payload = list()
+    try:
+        if session['token']:
+            token = session['token']
+        else:
+            token = get_token_auth_header('Authorization', None)
+            parts = token.split()
+            token = parts[1]
+        
+        jsonurl = urlopen(f'https://{AUTH0_DOMAIN}/.well-known/jwks.json')
+        jwks = json.loads(jsonurl.read())
+        unverified_header = jwt.get_unverified_header(token)
+        rsa_key = {}
+        payload = None
+        if jwks:
+            for key in jwks['keys']:
+                if key['kid'] == unverified_header['kid']:
+                    rsa_key = {
+                        'kty': key['kty'],
+                        'kid': key['kid'],
+                        'use': key['use'],
+                        'n': key['n'],
+                        'e': key['e']
+                    }
+        if rsa_key:
+            payload = jwt.decode(
+                token,
+                rsa_key,
+                algorithms=ALGORITHMS,
+                audience=AUTH0_AUDIENCE,
+                issuer='https://' + AUTH0_DOMAIN + '/'
+            )
+        
+        return payload.get('permissions')
+    except: 
+        return payload
+    
+    
 
 def verify_decode_jwt(token):
     """Decodes and verifies the provided token

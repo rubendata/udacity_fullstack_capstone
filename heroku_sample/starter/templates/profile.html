@@ -10,10 +10,8 @@
                 <img class="avatar" src="{{userinfo['picture']}}"/>
                 <h2>Welcome {{userinfo['name']}}</h2>
                 <pre>{{userinfo_pretty}}</pre>
-                {% for i in userinfo %}
-                <p>{{ i }}: {{ userinfo.get(i) }}</p>
-                {% endfor %}
-
+                <p><b>token:</b> {{ token }}</p>
+    
                 <a id="qsLogoutBtn" class="btn btn-primary btn-lg btn-logout btn-block" href="/logout">Logout</a>
             </div>
         </div>
