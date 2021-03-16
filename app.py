@@ -9,7 +9,7 @@ from flask_cors import CORS, cross_origin
 from forms import *
 from flask_migrate import Migrate
 from dotenv import load_dotenv, find_dotenv
-
+from sqlalchemy import asc, desc
 from functools import wraps
 import json
 from os import environ as env
@@ -106,7 +106,9 @@ def create_app(test_config=None):
     @app.route('/')
     def home():
         permission = get_permission()
-        posts = Post.query.all()
+        #posts = Post.query.all()
+        posts = Post.query.order_by(Post.id.desc())
+        
         return render_template("index.html", posts=posts, permission=permission)
 
     @app.route('/profile')
