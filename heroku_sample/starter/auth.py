@@ -1,6 +1,5 @@
 import json
 import os
-import sys
 from flask import request, _request_ctx_stack, abort, session
 from functools import wraps
 from jose import jwt
@@ -13,6 +12,11 @@ AUTH0_AUDIENCE = os.getenv('AUTH0_AUDIENCE')
 
 
 # AuthError Exception
+'''
+AuthError Exception
+A standardized way to communicate auth failure modes
+'''
+
 class AuthError(Exception):
     def __init__(self, error, status_code):
         self.error = error
