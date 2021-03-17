@@ -100,10 +100,20 @@ def create_app(test_config=None):
         print('Audience: {}'.format(AUTH0_AUDIENCE))
         return auth0.authorize_redirect(redirect_uri=AUTH0_CALLBACK_URL, audience=AUTH0_AUDIENCE)
 
+    @app.route('/logout')
+    def logout():
+        try:
+            session.clear()
+            params = {'returnTo': url_for('home', _external=True), 'client_id': AUTH0_CLIENT_ID}
+            return redirect(auth0.api_base_url + '/v2/logout?' + urlencode(params))
+        except Exception as e:
+            print (e)
+
     # -------------------------------------------------------------------------#
     # Application Routes
     # -------------------------------------------------------------------------#
     @app.route('/')
+    @cross_origin()
     def home():
         permission = get_permission()
         #posts = Post.query.all()
@@ -112,11 +122,16 @@ def create_app(test_config=None):
         return render_template("index.html", posts=posts, permission=permission)
 
     @app.route('/profile')
-    def profile():
+    @cross_origin()
+    @requires_auth('post:images')
+    def profile(payload):
+        print(payload)
+        permission = get_permission()
         return render_template('profile.html',
                             userinfo=session[constants.PROFILE_KEY],
                             userinfo_pretty=json.dumps(session[constants.JWT_PAYLOAD], indent=4),
-                            token=session['token'])
+                            token=session['token'],
+                            permission = permission)
     
     @app.route('/posts/create', methods=['POST', 'GET'])
     @cross_origin()
@@ -136,18 +151,38 @@ def create_app(test_config=None):
             except Exception as e:
                 print(e)
                 abort(400)
-        return render_template("form.html", form=form)
+        return render_template("new_post.html", form=form)
     
+    @app.route('/posts/<post_id>/delete', methods=['DELETE'])
+    @cross_origin()
+    @requires_auth('post:images')
+    def delete_post(payload, post_id):
+        post = Post.query.filter_by(id=post_id).one_or_none()
+        post.delete()
+        print(f"post with id {post_id} successfully deleted")
+        return redirect(url_for("home"))
+            
+     
+ 
+    @app.route('/posts/<post_id>/edit', methods=['GET','POST']) #TODO: add permission check
+    @cross_origin()
+    @requires_auth('post:images')
+    def edit_post(payload, post_id):
+        post = Post.query.filter_by(id=post_id).one_or_none()
+        if request.method == "POST":
+            post.comment=request.form.get("comment")
+            post.date=request.form.get("date")
+            post.title=request.form.get("title")
+            post.image=request.form.get("image")
+            print(post)
+            post.update()
+            return redirect(url_for("home"))
+      
+        else:
+            form = PostForm(request.form)
+            return render_template("edit_post.html", post=post, form=form)
+        
     
-    @app.route('/logout')
-    def logout():
-        try:
-            session.clear()
-            params = {'returnTo': url_for('home', _external=True), 'client_id': AUTH0_CLIENT_ID}
-            return redirect(auth0.api_base_url + '/v2/logout?' + urlencode(params))
-        except Exception as e:
-            print (e)
-
     # -------------------------------------------------------------------------#
     # Error handling
     # -------------------------------------------------------------------------#

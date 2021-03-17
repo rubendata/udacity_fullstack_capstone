@@ -12,6 +12,11 @@
                 <pre>{{userinfo_pretty}}</pre>
                 <p><b>token:</b> {{ token }}</p>
     
+                
+                <p><b>permission:</b>  {% for i in permission %}  
+                    {{ i }}, 
+                {% endfor %}</p>
+                
                 <a id="qsLogoutBtn" class="btn btn-primary btn-lg btn-logout btn-block" href="/logout">Logout</a>
             </div>
         </div>
