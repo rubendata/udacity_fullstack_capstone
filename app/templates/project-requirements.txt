@@ -4,10 +4,10 @@ Models will include at least…
 - Two classes with primary keys at at least two attributes each
 - [Optional but encouraged] One-to-many or many-to-many relationships between classes
 Endpoints will include at least…
-- Two GET requests
-- One POST request
-- One PATCH request
-- One DELETE request
+- Two GET requests - done
+- One POST request - done
+- One PATCH request - done
+- One DELETE request - done
 Roles will include at least…
 - Two roles with different permissions
 - Permissions specified for all endpoints

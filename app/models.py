@@ -3,6 +3,8 @@ from sqlalchemy import *
 from flask_sqlalchemy import SQLAlchemy
 import json
 
+from sqlalchemy.orm import backref
+
 database_path = os.environ['DATABASE_URL']
 
 db = SQLAlchemy()
@@ -29,6 +31,7 @@ class Post(db.Model):
   author = db.Column(db.String(), nullable=False)
   image = db.Column(db.String(), nullable=False)
   date = db.Column(db.Date(), nullable=False)
+  group_id = db.Column(db.Integer, db.ForeignKey('groups.id'))
 
   def __init__(self, **kwargs):
     super(Post, self).__init__(**kwargs)
@@ -40,6 +43,35 @@ class Post(db.Model):
       'comment': self.comment,
       'author': self.author,
       'date': self.date,
+    }
+
+  def insert(self):
+    db.session.add(self)
+    db.session.commit()
+
+  def update(self):
+    db.session.commit()
+
+  def delete(self):
+    db.session.delete(self)
+    db.session.commit()
+
+class Group(db.Model):  
+  __tablename__ = 'groups'
+
+  id = db.Column(db.Integer(), primary_key=True)
+  name = db.Column(db.String(), nullable=False)
+  posts = db.relationship('Post', backref='post')
+  
+  
+
+  def __init__(self, **kwargs):
+    super(Group, self).__init__(**kwargs)
+  
+  def format(self):
+    return {
+      'id': self.id,
+      'title': self.name,
     }
 
   def insert(self):
