@@ -1,0 +1,14 @@
+@import "./global.css";
+
+
+
+.form-group{
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    resize: none;
+ }
+
+ .long_textfield{
+     height: 200px; }
