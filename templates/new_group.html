@@ -12,7 +12,7 @@
          
       <input type="submit" value="Create Group" class="btn btn-primary btn-lg btn-block">
       {% for group in groups %}
-        <div id={{"group"~groups.id}} class="post_container">
+        <div id={{"group"~group.id}} class="post_container">
           <h1> {{group.name}} </h1>
           
           <a href="{{ url_for('edit_group',group_id=group.id) }}">EDIT</a>

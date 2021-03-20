@@ -3,10 +3,12 @@
 
 {% block content%}
 <section id="content" class="flex_col_center">
-    <label for ="search" class="search">Search post</label>
-    <input type ="search" id="search" name="search">
     
-  
+    <select name="groups" id="groups_select">
+        {% for group in groups %}  
+        <option value="{{group.id}}" id="{{"group"~group.id}}" class="select_options">{{group.name}}</option>
+        {% endfor %}
+    </select>
 
     {% for i in permission %}  
         {% if i=='post:images' %}, 
@@ -24,7 +26,7 @@
         <h1> {{post.title}} </h1>
         <div class="flex_col_center"> <img src="{{post.image}}" alt="post image" class="post_image"> </div>
         <h2>"{{post.comment}}" </h2>
-        <p class="posted"> posted by: {{post.author}}, {{post.date}} </p> 
+        <p class="posted"> posted by: {{post.author}}, {{post.date}}, {{ post.group_id}} </p> 
         <button class="button_delete" id="{{ post.id }}">&cross;</button>
 		<a href="{{ url_for('edit_post',post_id=post.id) }}">EDIT</a>
     </div>
@@ -54,7 +56,28 @@
             })
 	}
 
-	
+
+    const dropDown = document.getElementById("groups_select")
+    dropDown.addEventListener("click", (e) => {
+        value = e.target.value
+        console.log(value)
+        fetch ("/?group="+value, {
+               method: "GET"
+           
+                    
+               
+                })   
+                .then((response) => {
+                    console.log(response)
+                    
+                    
+                })
+
+    })
+
+    
+   
+
 </script>
 {% endblock %}
 

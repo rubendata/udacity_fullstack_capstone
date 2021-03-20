@@ -115,8 +115,17 @@ def logout():
 @app.route('/')
 @cross_origin()
 def home():
+    group = None
+    group = request.args
+    
+    if group:
+        
+        group = filter.get("group")
+        posts = Post.query.filter_by(group_id=group).order_by(Post.id.desc())
+    else:
+        posts = Post.query.order_by(Post.id.desc())
     permission = get_permission()
-    posts = Post.query.order_by(Post.id.desc())
+    
     groups = Group.query.all()
     
     return render_template("index.html", posts=posts, groups=groups, permission=permission)
@@ -140,8 +149,6 @@ def profile(payload):
 def create_post(payload):
     form = PostForm(request.form)
     groups = Group.query.all()
-    for g in groups:
-        print(g.id, g.name)
     form.group.choices = [(g.id, g.name) for g in groups]
     userinfo=session[constants.PROFILE_KEY],
     if request.method == "POST":
@@ -150,6 +157,7 @@ def create_post(payload):
             author = userinfo[0].get("name")
             post = Post()
             form.populate_obj(post)
+            post.group_id= request.form.get("group")
             post.author = author
             post.insert()
             return redirect (url_for("home"))
