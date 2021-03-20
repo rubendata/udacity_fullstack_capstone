@@ -1,0 +1,81 @@
+@import "./global.css";
+
+
+#content{
+    margin: auto;
+    background-color: rgb(240,240,240);
+    max-width: 1100px;
+    min-height: calc(100vh - var(--nav-height));
+    margin-top: var(--nav-height);
+}
+
+.post_container{
+    margin-top: 20px;
+    border: 1px black solid;
+    min-width: 60%;
+}
+
+
+.btn_round {
+    height: var(--font-size-normal);
+    background-color: var(--secondary-color);
+    padding: 20px 0;
+    width: 130px;
+    color: white;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: none;
+    margin-top: 20px;
+}
+
+.post_image{
+    max-width: 600px;
+}
+
+.search {
+    margin-top: 20px;
+}
+
+.post_container h1,
+.post_container h2,
+.post_container p{
+    text-align: center;
+}
+
+.posted{
+    font-size: var(--font-size-small);
+    color: #333;
+}
+
+@media only screen and (max-width: 1100px){
+    #content{
+     
+        max-width: 90%;
+     }
+    
+    .post_container{
+     
+        min-width: 80%;
+    }
+
+}
+
+@media only screen and (max-width: 600px){
+    #content{
+     
+        max-width: 90%;
+      
+    }
+
+    .post_container{
+     
+        min-width: 90%;
+    }
+
+    .post_image{
+        max-width: 300px;
+    }
+}
