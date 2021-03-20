@@ -151,7 +151,6 @@ def create_post(payload):
             post = Post()
             form.populate_obj(post)
             post.author = author
-            post.group_id=2
             post.insert()
             return redirect (url_for("home"))
             
