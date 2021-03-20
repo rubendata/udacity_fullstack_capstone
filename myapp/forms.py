@@ -3,9 +3,6 @@ from wtforms import StringField, DateField, SelectField
 from wtforms.fields.html5 import URLField
 from wtforms.validators import DataRequired, url
 from datetime import datetime
-from models import Group
-
-
     
 
 
