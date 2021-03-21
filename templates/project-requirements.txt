@@ -1,8 +1,8 @@
 General Specifications
 
 Models will include at least…
-- Two classes with primary keys at at least two attributes each
-- [Optional but encouraged] One-to-many or many-to-many relationships between classes
+- Two classes with primary keys at at least two attributes each - done
+- [Optional but encouraged] One-to-many or many-to-many relationships between classes - done
 Endpoints will include at least…
 - Two GET requests - done
 - One POST request - done
@@ -15,3 +15,11 @@ Tests will include at least….
 - One test for success behavior of each endpoint
 - One test for error behavior of each endpoint
 - At least two tests of RBAC for each role
+
+
+Testuser for post:group permission:
+    postgroup@udacityruben.com
+    Udacity1!
+
+    postimages@udacityruben.com
+    Udacity1!

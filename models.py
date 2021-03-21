@@ -4,8 +4,16 @@ from flask_sqlalchemy import SQLAlchemy
 import json
 
 from sqlalchemy.orm import backref
+from dotenv import load_dotenv, find_dotenv
+# database_path = os.environ['DATABASE_URL']
 
-database_path = os.environ['DATABASE_URL']
+#load .env variables for Auth0
+ENV_FILE = find_dotenv()
+if ENV_FILE:
+    load_dotenv(ENV_FILE)
+
+
+database_path = os.getenv('DATABASE_URL')
 
 db = SQLAlchemy()
 
