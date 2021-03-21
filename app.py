@@ -21,26 +21,6 @@ import constants
 
 from auth import requires_auth, get_permission, verify_decode_jwt,AuthError
 
-
-
-app = Flask(__name__)
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
-app.debug = True
-setup_db(app)
-migrate = Migrate(app, db)
-
-# -------------------------------------------------------------------------#
-# Enable CORS
-# -------------------------------------------------------------------------#
-CORS(app)
-@app.after_request
-def after_request(response):
-    response.headers.add('Access-Control-Allow-Headers',
-                            'Content-Type,Authorization,true')
-    response.headers.add('Access-Control-Allow-Methods',
-                            'GET,PATCH,POST,DELETE,OPTIONS')
-    return response
-
         
 # -------------------------------------------------------------------------#
 # Setup Auth0 and login
@@ -59,10 +39,19 @@ AUTH0_DOMAIN = os.getenv('AUTH0_DOMAIN')
 AUTH0_BASE_URL = 'https://'+str(AUTH0_DOMAIN)
 AUTH0_AUDIENCE = os.getenv('AUTH0_AUDIENCE')
 
-#Auth0 configuration
-oauth = OAuth(app)
-auth0 = oauth.register(
-    'auth0',
+
+def create_app(test_config=None):
+ 
+    app = Flask(__name__)
+    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+    app.debug = True
+    setup_db(app)
+    migrate = Migrate(app, db)
+
+   #Auth0 configuration
+    oauth = OAuth(app)
+    auth0 = oauth.register(
+        'auth0',
     client_id=AUTH0_CLIENT_ID,
     client_secret=AUTH0_CLIENT_SECRET,
     api_base_url=AUTH0_BASE_URL,
@@ -72,8 +61,19 @@ auth0 = oauth.register(
         'scope': 'openid profile email',
     },
 )
-def create_app(test_config=None):
+# -------------------------------------------------------------------------#
+# Enable CORS
+# -------------------------------------------------------------------------#
+    CORS(app)
+    @app.after_request
+    def after_request(response):
+        response.headers.add('Access-Control-Allow-Headers',
+                                'Content-Type,Authorization,true')
+        response.headers.add('Access-Control-Allow-Methods',
+                                'GET,PATCH,POST,DELETE,OPTIONS')
+        return response
     #callback handling for Auth0
+
     @app.route('/callback')
     def callback_handling():
         token = auth0.authorize_access_token()
