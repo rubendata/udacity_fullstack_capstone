@@ -115,20 +115,29 @@ def logout():
 @app.route('/')
 @cross_origin()
 def home():
-    group = None
-    group = request.args
-    
-    if group:
-        
-        group = filter.get("group")
-        posts = Post.query.filter_by(group_id=group).order_by(Post.id.desc())
-    else:
-        posts = Post.query.order_by(Post.id.desc())
+    groups = Group.query.all()
     permission = get_permission()
+    posts = Post.query.order_by(Post.id.desc())
+    return render_template("index.html", posts=posts, groups=groups, permission=permission)
+
+
+@app.route("/posts/<group_id>")
+def filter_posts(group_id):
     
     groups = Group.query.all()
-    
-    return render_template("index.html", posts=posts, groups=groups, permission=permission)
+    permission = get_permission()
+    posts = Post.query.filter_by(group_id=group_id).order_by(Post.id.desc())
+    formatted_posts = [post.format() for post in posts]
+    print(formatted_posts)
+    # return jsonify({
+    #     "posts":formatted_posts,
+    #     "success": True
+    #     }
+    #     )
+
+    return render_template("posts.html", posts=posts, groups=groups, permission=permission)
+
+        
 
 @app.route('/profile')
 @cross_origin()

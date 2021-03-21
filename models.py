@@ -43,6 +43,7 @@ class Post(db.Model):
       'comment': self.comment,
       'author': self.author,
       'date': self.date,
+      "group": self.group_id
     }
 
   def insert(self):

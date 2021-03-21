@@ -27,7 +27,7 @@
         <h1> {{post.title}} </h1>
         <div class="flex_col_center"> <img src="{{post.image}}" alt="post image" class="post_image"> </div>
         <h2>"{{post.comment}}" </h2>
-        <p class="posted"> posted by: {{post.author}}, {{post.date}}, {{ group_id}} </p> 
+        <p class="posted"> posted by: {{post.author}}, {{post.date}}, {{ post.group_id}} </p> 
         <button class="button_delete" id="{{ post.id }}">&cross;</button>
 		<a href="{{ url_for('edit_post',post_id=post.id) }}">EDIT</a>
     </div>
