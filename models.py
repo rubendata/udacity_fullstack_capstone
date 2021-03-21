@@ -31,7 +31,7 @@ class Post(db.Model):
   author = db.Column(db.String(), nullable=False)
   image = db.Column(db.String(), nullable=False)
   date = db.Column(db.Date(), nullable=False)
-  group_id = db.Column(db.Integer, db.ForeignKey('groups.id'))
+  group_id = db.Column(db.Integer, db.ForeignKey('groups.id'), nullable=False)
 
   def __init__(self, **kwargs):
     super(Post, self).__init__(**kwargs)
