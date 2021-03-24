@@ -46,19 +46,17 @@ def create_app(test_config=None):
     setup_db(app)
     migrate = Migrate(app, db)
 
-   #Auth0 configuration
     oauth = OAuth(app)
+
     auth0 = oauth.register(
         'auth0',
-    client_id=AUTH0_CLIENT_ID,
-    client_secret=AUTH0_CLIENT_SECRET,
-    api_base_url=AUTH0_BASE_URL,
-    access_token_url=AUTH0_BASE_URL + '/oauth/token',
-    authorize_url=AUTH0_BASE_URL + '/authorize',
-    client_kwargs={
-        'scope': 'openid profile email',
-    },
-)
+        client_id=AUTH0_CLIENT_ID,
+        client_secret=AUTH0_CLIENT_SECRET,
+        api_base_url=AUTH0_BASE_URL,
+        access_token_url='https://onstagram.eu.auth0.com' + '/oauth/token',
+        authorize_url='https://onstagram.eu.auth0.com' + '/authorize',
+        client_kwargs={'scope': 'openid profile email'}
+      )
 # -------------------------------------------------------------------------#
 # Enable CORS
 # -------------------------------------------------------------------------#
@@ -72,29 +70,34 @@ def create_app(test_config=None):
         return response
     #callback handling for Auth0
 
-    @app.route('/callback')
-    def callback_handling():
+   
+      # route handler to log in
+    @app.route('/login', methods=['GET'])
+    @cross_origin()
+    def login():
+        print('Audience: {}'.format(AUTH0_AUDIENCE))
+        print('callback: {}'.format(AUTH0_CALLBACK_URL))
+        return auth0.authorize_redirect(
+          redirect_uri=AUTH0_CALLBACK_URL,
+          audience=AUTH0_AUDIENCE
+          )
+
+     # route handler for home page once logged in
+    @app.route('/callback', methods=['GET'])
+    @cross_origin()
+    def post_login():
         token = auth0.authorize_access_token()
         session['token'] = token['access_token']
-        print(session['token'])
         resp = auth0.get('userinfo')
         userinfo = resp.json()
-        
         session[constants.JWT_PAYLOAD] = userinfo
         session[constants.JWT] = token['access_token']
         session[constants.PROFILE_KEY] = {
             'user_id': userinfo['sub'],
-            'name': userinfo['name'],
-            'picture': userinfo['picture']
+            'name': userinfo['name']
         }
-        session[constants.SESSION_NAME] = userinfo['name']
-        
-        return redirect('/profile')
-
-    @app.route('/login')
-    def login():
-        print('Audience: {}'.format(AUTH0_AUDIENCE))
-        return auth0.authorize_redirect(redirect_uri=AUTH0_CALLBACK_URL, audience=AUTH0_AUDIENCE)
+        print(session['token'])
+        return redirect(url_for('profile'))
 
     @app.route('/logout')
     def logout():
@@ -111,10 +114,15 @@ def create_app(test_config=None):
     @app.route('/')
     @cross_origin()
     def home():
-        groups = Group.query.all()
-        permission = get_permission()
-        posts = Post.query.order_by(Post.id.desc())
-        return render_template("index.html", posts=posts, groups=groups, permission=permission), 200
+        try:
+            groups = Group.query.all()
+            permission = get_permission()
+            posts = Post.query.order_by(Post.id.desc())
+            return render_template("index.html", posts=posts, groups=groups, permission=permission), 200
+        except Exception as e:
+            print(e)
+            abort(400)
+
 
 
     @app.route("/posts/<group_id>")
@@ -129,15 +137,19 @@ def create_app(test_config=None):
 
     @app.route('/profile')
     @cross_origin()
-    @requires_auth()
-    def profile(payload):
-        print(payload)
-        permission = get_permission()
-        return render_template('profile.html',
-                            userinfo=session[constants.PROFILE_KEY],
-                            userinfo_pretty=json.dumps(session[constants.JWT_PAYLOAD], indent=4),
-                            token=session['token'],
-                            permission = permission)
+    def profile():
+        try:
+            permission = get_permission()
+            userinfo=session[constants.PROFILE_KEY]
+            token=session['token']
+            
+            return render_template("profile.html", userinfo = userinfo, token = token, permission = permission),200
+            
+        except Exception as e:
+            print(f"error: {e}")
+            abort(401)
+        
+      
 
     # ----------- POSTS ENDPOINTS ------------
     @app.route('/posts/create', methods=['POST', 'GET'])
@@ -147,11 +159,11 @@ def create_app(test_config=None):
         form = PostForm(request.form)
         groups = Group.query.all()
         form.group.choices = [(g.id, g.name) for g in groups]
-        userinfo=session[constants.PROFILE_KEY],
+        
         if request.method == "POST":
             try:
-                
-                author = userinfo[0].get("name")
+                userinfo=session[constants.PROFILE_KEY]
+                author = userinfo.get("name"),
                 post = Post()
                 form.populate_obj(post)
                 post.group_id= request.form.get("group")
