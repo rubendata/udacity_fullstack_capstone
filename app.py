@@ -27,20 +27,18 @@ from auth import requires_auth, get_permission, verify_decode_jwt,AuthError
 # -------------------------------------------------------------------------#
 
 
-#load .env variables for Auth0
-ENV_FILE = find_dotenv()
-if ENV_FILE:
-    load_dotenv(ENV_FILE)
-
-AUTH0_CALLBACK_URL = os.getenv('AUTH0_CALLBACK_URL')
-AUTH0_CLIENT_ID = os.getenv('AUTH0_CLIENT_ID')
-AUTH0_CLIENT_SECRET = os.getenv('AUTH0_CLIENT_SECRET')
-AUTH0_DOMAIN = os.getenv('AUTH0_DOMAIN')
-AUTH0_BASE_URL = 'https://'+str(AUTH0_DOMAIN)
-AUTH0_AUDIENCE = os.getenv('AUTH0_AUDIENCE')
-
-
 def create_app(test_config=None):
+    #load .env variables for Auth0
+    ENV_FILE = find_dotenv()
+    if ENV_FILE:
+        load_dotenv(ENV_FILE)
+
+    AUTH0_CALLBACK_URL = os.getenv('AUTH0_CALLBACK_URL')
+    AUTH0_CLIENT_ID = os.getenv('AUTH0_CLIENT_ID')
+    AUTH0_CLIENT_SECRET = os.getenv('AUTH0_CLIENT_SECRET')
+    AUTH0_DOMAIN = os.getenv('AUTH0_DOMAIN')
+    AUTH0_BASE_URL = 'https://'+str(AUTH0_DOMAIN)
+    AUTH0_AUDIENCE = os.getenv('AUTH0_AUDIENCE')
  
     app = Flask(__name__)
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
@@ -199,7 +197,7 @@ def create_app(test_config=None):
     @app.route("/groups/create", methods=['POST', 'GET'])
     @cross_origin()
     @requires_auth("post:groups")
-    def create_group():
+    def create_group(payload):
         form = GroupForm(request.form)
         groups = Group.query.all()
         if request.method == "POST":
