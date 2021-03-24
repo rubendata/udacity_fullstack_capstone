@@ -127,12 +127,26 @@ def create_app(test_config=None):
 
     @app.route("/posts/<group_id>")
     def filter_posts(group_id):
-        
+        group_id=int(group_id) #convert group_id to integer
         groups = Group.query.all()
-        permission = get_permission()
-        posts = Post.query.filter_by(group_id=group_id).order_by(Post.id.desc())
-        return render_template("posts.html", posts=posts, groups=groups, permission=permission)
-
+        
+        for g in groups: #check if requested group exists
+            if g.id == group_id:
+                group_id = g.id
+                break
+            else:
+                return abort(400)
+        
+        try:
+            permission = get_permission()
+            posts = Post.query.filter_by(group_id=group_id).order_by(Post.id.desc())
+            print(type(posts))
+            return render_template("posts.html", posts=posts, groups=groups, permission=permission),200
+        
+        except Exception as e:
+            print(f"error: {e}")
+            abort(400)
+        
             
 
     @app.route('/profile')

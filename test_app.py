@@ -1,6 +1,7 @@
 import os
 import unittest
 import json
+from forms import *
 from flask_sqlalchemy import SQLAlchemy
 from app import create_app
 from models import setup_db, Post, Group
@@ -23,6 +24,7 @@ class OnstagramTestCase(unittest.TestCase):
         self.database_path = "postgres://{}:{}@{}/{}".format('postgres','postgres','localhost:5432', self.database_name)
         setup_db(self.app, self.database_path)
         self.post_images = Authtokens["post_images"]
+        self.post_groups = Authtokens["post_groups"]
 
         # binds the app to the current context
         with self.app.app_context():
@@ -44,6 +46,39 @@ class OnstagramTestCase(unittest.TestCase):
         res = self.client().get('/profile')
         self.assertEqual(res.status_code,401)
 
+    def test_create_post_get(self):
+        res = self.client().get('/posts/create',headers={'Authorization':
+                                str(self.post_images), 'Test': 'test'})
+        self.assertEqual(res.status_code,200)
+        res = self.client().get('/posts/create')
+        self.assertEqual(res.status_code,401)
+    
+  
+    def test_create_group_get(self):
+        res = self.client().get('/groups/create',headers={'Authorization':
+                                str(self.post_groups), 'Test': 'test'})
+        self.assertEqual(res.status_code,200)
+        res = self.client().get('/groups/create')
+        self.assertEqual(res.status_code,401)
+
+    def test_create_group_post(self):
+        with self.app.test_request_context(
+            '/groups/create', headers={'Authorization':
+                                     str(self.post_groups), 'Test': 'test'}):
+            form = GroupForm(
+                name='test',
+                
+            )
+            self.assertIsInstance(form, GroupForm)
+            
+
+    def test_filter_posts(self):
+        res = self.client().get("/posts/1")
+        self.assertEqual(res.status_code,200)
+        res = self.client().get("/posts/99999999999")
+        self.assertEqual(res.status_code,400)
+
+    
 
 # Make the tests conveniently executable
 if __name__ == "__main__":
