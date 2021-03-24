@@ -9,8 +9,8 @@ Endpoints will include at least…
 - One PATCH request - done
 - One DELETE request - done
 Roles will include at least…
-- Two roles with different permissions
-- Permissions specified for all endpoints
+- Two roles with different permissions - done
+- Permissions specified for all endpoints - done
 Tests will include at least….
 - One test for success behavior of each endpoint
 - One test for error behavior of each endpoint
