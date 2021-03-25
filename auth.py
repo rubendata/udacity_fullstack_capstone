@@ -86,7 +86,6 @@ def verify_decode_jwt(token):
 
     # Finally, verify
     if rsa_key:
-        print('rsa_key exists')
         try:
             # use the key to validate the JWT
             payload = jwt.decode(
@@ -143,11 +142,7 @@ def requires_auth(permission=''):
                 if token is None:
                     abort(400)
                 payload = verify_decode_jwt(token)
-                print('Payload is: {}'.format(payload))
-                print(f'testing for permission: {permission}')
-                if check_permissions(permission, payload):
-                    print('Permission is in permissions')
-
+              
                 return f(payload, *args, **kwargs)
             except Exception as e:
                 print (e)
