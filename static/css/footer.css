@@ -1,0 +1,8 @@
+@import "./global.css";
+
+.footer{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
