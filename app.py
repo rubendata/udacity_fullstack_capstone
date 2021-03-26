@@ -128,16 +128,13 @@ def create_app(test_config=None):
     @app.route("/posts/<int:group_id>")
     def filter_posts(group_id):
         groups = Group.query.all()
-        print(group_id)
         for g in groups: #check if requested group exists
-            print(g.id)
             if g.id == group_id:
                 group_id = g.id
                 id=group_id
                 break
             else:
                 id=None
-        print(id)
         if id:
             try:
                 permission = get_permission()
