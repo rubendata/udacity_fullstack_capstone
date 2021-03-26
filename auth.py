@@ -59,7 +59,7 @@ def verify_decode_jwt(token):
     AUTH0_DOMAIN = os.getenv('AUTH0_DOMAIN')
     ALGORITHMS = os.getenv('ALGORITHMS')
     AUTH0_AUDIENCE = os.getenv('AUTH0_AUDIENCE')
-    print(f'https://{AUTH0_DOMAIN}/.well-known/jwks.json')
+    #print(f'https://{AUTH0_DOMAIN}/.well-known/jwks.json')
     jsonurl = urlopen(f'https://{AUTH0_DOMAIN}/.well-known/jwks.json')
     jwks = json.loads(jsonurl.read())
 
@@ -138,7 +138,7 @@ def requires_auth(permission=''):
                     token = session['token']
                 else:
                     token = get_token_auth_header()
-                print('token at authorization time: {}'.format(token))
+                #print('token at authorization time: {}'.format(token))
                 if token is None:
                     abort(400)
                 payload = verify_decode_jwt(token)

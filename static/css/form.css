@@ -12,3 +12,7 @@
 
  .long_textfield{
      height: 200px; }
+
+.form{
+    height: 100%;
+}

@@ -15,20 +15,9 @@
     min-width: 60%;
 }
 
-
-.btn_round {
-    height: var(--font-size-normal);
-    background-color: var(--secondary-color);
-    padding: 20px 0;
-    width: 130px;
-    color: white;
-    border-radius: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    border: none;
-    margin-top: 20px;
+.button_delete,
+.button_edit{
+    margin: 20px
 }
 
 .post_image{

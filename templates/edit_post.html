@@ -4,7 +4,7 @@
 {% block content%}
 
 <form class="form flex_col_center" id="form" method="POST">
-    <h1 class="form-heading">Create a new Post</h1>
+    <h1 class="form-heading">Edit Post</h1>
       <div class="form-group">
         <label for="title">Title</label>
         {{ form.title(class_ = 'form-control', autofocus = true, value=post.title) }}
@@ -22,7 +22,7 @@
         <label for="date">Date</label>
         {{ form.date(class_ = 'form-control', autofocus = true, value=post.date) }}
       </div>
-      <input type="submit" value="Edit Post" class="btn_round">
+     <input type="submit" value="Edit Post">
   
 </form>
 {% endblock %}

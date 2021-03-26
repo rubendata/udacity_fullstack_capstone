@@ -125,27 +125,29 @@ def create_app(test_config=None):
 
 
 
-    @app.route("/posts/<group_id>")
+    @app.route("/posts/<int:group_id>")
     def filter_posts(group_id):
-        group_id=int(group_id) #convert group_id to integer
         groups = Group.query.all()
-        
+        print(group_id)
         for g in groups: #check if requested group exists
+            print(g.id)
             if g.id == group_id:
                 group_id = g.id
+                id=group_id
                 break
             else:
-                return abort(400)
-        
-        try:
-            permission = get_permission()
-            posts = Post.query.filter_by(group_id=group_id).order_by(Post.id.desc())
-            print(type(posts))
-            return render_template("posts.html", posts=posts, groups=groups, permission=permission),200
-        
-        except Exception as e:
-            print(f"error: {e}")
-            abort(400)
+                id=None
+        print(id)
+        if id:
+            try:
+                permission = get_permission()
+                posts = Post.query.filter_by(group_id=id).order_by(Post.id.desc())
+                return render_template("posts.html", posts=posts, groups=groups, permission=permission),200
+            except Exception as e:
+                print(f"error: {e}")
+                abort(400)
+        else:
+            return "Group Not Found. Redirecting to home", {"Refresh": "3; url=http://localhost:5000"}
         
             
 
@@ -156,7 +158,6 @@ def create_app(test_config=None):
             permission = get_permission()
             userinfo=session[constants.PROFILE_KEY]
             token=session['token']
-            
             return render_template("profile.html", userinfo = userinfo, token = token, permission = permission),200
             
         except Exception as e:
@@ -205,13 +206,15 @@ def create_app(test_config=None):
     @cross_origin()
     @requires_auth('post:images')
     def edit_post(payload, post_id):
+        groups = Group.query.all()
+        form = PostForm(request.form)
+        form.group.choices = [(g.id, g.name) for g in groups]
         post = Post.query.filter_by(id=post_id).one_or_none()
         if request.method == "POST":
-            post.comment=request.form.get("comment")
-            post.date=request.form.get("date")
-            post.title=request.form.get("title")
-            post.image=request.form.get("image")
-            print(post)
+            form.populate_obj(post)
+            post.group_id= request.form.get("group")
+            
+            
             post.update()
             return redirect(url_for("home"))
         
@@ -245,7 +248,6 @@ def create_app(test_config=None):
         group = Group.query.filter_by(id=group_id).one_or_none()
         if request.method == "POST":
             group.name=request.form.get("name")
-            print(group)
             group.update()
             return redirect(url_for("home"))
         

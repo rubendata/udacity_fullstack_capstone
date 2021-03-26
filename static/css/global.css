@@ -11,8 +11,6 @@
 }
 
 
-
-
 :root{
     --primary-color:rgb(33,33,33);
     --secondary-color:#E65227;
@@ -22,7 +20,6 @@
     --font-size-bigger: 3.6rem;
     --nav-height: 10vh;
 }
-
 
 h1{
     font-size: var(--font-size-bigger);
@@ -66,4 +63,24 @@ a{
     justify-content: center;
     flex-direction: row;
 
+}
+
+.btn_round {
+    height: var(--font-size-normal);
+    background-color: var(--secondary-color);
+    padding: 20px 0;
+    width: 130px;
+    color: white;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: none;
+    margin-top: 20px;
+    text-align: start;
+}
+
+.input_submit_btn{
+    margin-top: 20px;
 }
